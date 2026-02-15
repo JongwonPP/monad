@@ -1,5 +1,6 @@
 package com.jongwon.monad.member.signup;
 
+import com.jongwon.monad.auth.domain.PasswordEncoder;
 import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,11 @@ import org.springframework.stereotype.Service;
 public class SignUpUseCase {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SignUpUseCase(MemberRepository memberRepository) {
+    public SignUpUseCase(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public SignUpResponse execute(SignUpRequest request) {
@@ -22,7 +25,13 @@ public class SignUpUseCase {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다");
         }
 
-        Member member = Member.create(request.email(), request.password(), request.nickname());
+        Member.validateRawPassword(request.password());
+
+        Member member = Member.create(
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                request.nickname()
+        );
         Member saved = memberRepository.save(member);
 
         return new SignUpResponse(

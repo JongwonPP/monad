@@ -45,19 +45,19 @@ class MemberTest {
 
     @Test
     void password_null이면_예외() {
-        assertThatThrownBy(() -> Member.create("test@example.com", null, "테스트유저"))
+        assertThatThrownBy(() -> Member.validateRawPassword(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void password_빈문자열이면_예외() {
-        assertThatThrownBy(() -> Member.create("test@example.com", "", "테스트유저"))
+        assertThatThrownBy(() -> Member.validateRawPassword(""))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void password_8자_미만이면_예외() {
-        assertThatThrownBy(() -> Member.create("test@example.com", "1234567", "테스트유저"))
+        assertThatThrownBy(() -> Member.validateRawPassword("1234567"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -99,22 +99,13 @@ class MemberTest {
 
     @Test
     void 비밀번호_변경_성공() {
-        Member member = Member.create("test@example.com", "password123", "테스트유저");
+        Member member = Member.create("test@example.com", "encoded_password123", "테스트유저");
         LocalDateTimeSnapshot before = new LocalDateTimeSnapshot(member.getUpdatedAt());
 
-        member.changePassword("password123", "newpassword123");
+        member.updatePassword("encoded_newpassword123");
 
-        assertThat(member.getPassword()).isEqualTo("newpassword123");
+        assertThat(member.getPassword()).isEqualTo("encoded_newpassword123");
         assertThat(member.getUpdatedAt()).isAfterOrEqualTo(before.value());
-    }
-
-    @Test
-    void 비밀번호_변경_시_기존_비밀번호_불일치면_예외() {
-        Member member = Member.create("test@example.com", "password123", "테스트유저");
-
-        assertThatThrownBy(() -> member.changePassword("wrongpassword", "newpassword123"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("기존 비밀번호가 일치하지 않습니다");
     }
 
     private record LocalDateTimeSnapshot(java.time.LocalDateTime value) {}

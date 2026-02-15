@@ -21,7 +21,6 @@ public class Member {
 
     public static Member create(String email, String password, String nickname) {
         validateEmail(email);
-        validatePassword(password);
         validateNickname(nickname);
         LocalDateTime now = LocalDateTime.now();
         return new Member(email, password, nickname, now, now);
@@ -33,12 +32,8 @@ public class Member {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void changePassword(String oldPassword, String newPassword) {
-        if (!this.password.equals(oldPassword)) {
-            throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다");
-        }
-        validatePassword(newPassword);
-        this.password = newPassword;
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -58,7 +53,7 @@ public class Member {
         }
     }
 
-    private static void validatePassword(String password) {
+    public static void validateRawPassword(String password) {
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("비밀번호는 빈 값일 수 없습니다");
         }

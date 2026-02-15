@@ -1,5 +1,7 @@
 package com.jongwon.monad.member.signup;
 
+import com.jongwon.monad.auth.domain.PasswordEncoder;
+import com.jongwon.monad.auth.fake.FakePasswordEncoder;
 import com.jongwon.monad.fixture.MemberFixture;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.member.fake.FakeMemberRepository;
@@ -13,11 +15,13 @@ class SignUpUseCaseTest {
 
     private SignUpUseCase useCase;
     private MemberRepository memberRepository;
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
         memberRepository = new FakeMemberRepository();
-        useCase = new SignUpUseCase(memberRepository);
+        passwordEncoder = new FakePasswordEncoder();
+        useCase = new SignUpUseCase(memberRepository, passwordEncoder);
     }
 
     @Test

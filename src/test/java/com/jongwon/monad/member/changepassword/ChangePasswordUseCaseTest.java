@@ -1,5 +1,7 @@
 package com.jongwon.monad.member.changepassword;
 
+import com.jongwon.monad.auth.domain.PasswordEncoder;
+import com.jongwon.monad.auth.fake.FakePasswordEncoder;
 import com.jongwon.monad.fixture.MemberFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.member.domain.Member;
@@ -15,11 +17,13 @@ class ChangePasswordUseCaseTest {
 
     private ChangePasswordUseCase useCase;
     private MemberRepository memberRepository;
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
         memberRepository = new FakeMemberRepository();
-        useCase = new ChangePasswordUseCase(memberRepository);
+        passwordEncoder = new FakePasswordEncoder();
+        useCase = new ChangePasswordUseCase(memberRepository, passwordEncoder);
     }
 
     @Test
@@ -31,7 +35,7 @@ class ChangePasswordUseCaseTest {
         useCase.execute(saved.getId(), request);
 
         Member updated = memberRepository.findById(saved.getId()).orElseThrow();
-        assertThat(updated.getPassword()).isEqualTo("newPassword456");
+        assertThat(updated.getPassword()).isEqualTo("encoded_newPassword456");
     }
 
     @Test
