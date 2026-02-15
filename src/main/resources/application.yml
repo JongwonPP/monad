@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: monad
+
+server:
+  port: 8080
