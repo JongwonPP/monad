@@ -28,7 +28,7 @@ class UpdatePostUseCaseTest {
         postRepository.save(post);
 
         UpdatePostRequest request = new UpdatePostRequest("수정된 제목", "수정된 본문");
-        UpdatePostResponse response = useCase.execute(post.getId(), request);
+        UpdatePostResponse response = useCase.execute(post.getId(), 1L, request);
 
         assertThat(response.id()).isEqualTo(post.getId());
         assertThat(response.title()).isEqualTo("수정된 제목");
@@ -40,7 +40,19 @@ class UpdatePostUseCaseTest {
     void 존재하지_않는_게시글_수정시_예외() {
         UpdatePostRequest request = new UpdatePostRequest("제목", "본문");
 
-        assertThatThrownBy(() -> useCase.execute(999L, request))
+        assertThatThrownBy(() -> useCase.execute(999L, 1L, request))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void 본인이_아닌_게시글_수정시_예외() {
+        Post post = PostFixture.create(1L);
+        postRepository.save(post);
+
+        UpdatePostRequest request = new UpdatePostRequest("수정된 제목", "수정된 본문");
+
+        assertThatThrownBy(() -> useCase.execute(post.getId(), 2L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("본인의 글만 수정할 수 있습니다");
     }
 }

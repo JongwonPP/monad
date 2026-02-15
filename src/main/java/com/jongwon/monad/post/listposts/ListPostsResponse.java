@@ -12,7 +12,8 @@ public record ListPostsResponse(
     public record PostItem(
             Long id,
             String title,
-            String author,
+            Long memberId,
+            String nickname,
             int viewCount,
             LocalDateTime createdAt
     ) {}

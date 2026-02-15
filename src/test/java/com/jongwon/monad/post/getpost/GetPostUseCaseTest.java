@@ -1,7 +1,11 @@
 package com.jongwon.monad.post.getpost;
 
+import com.jongwon.monad.fixture.MemberFixture;
 import com.jongwon.monad.fixture.PostFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
+import com.jongwon.monad.member.domain.Member;
+import com.jongwon.monad.member.domain.MemberRepository;
+import com.jongwon.monad.member.fake.FakeMemberRepository;
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
 import com.jongwon.monad.post.fake.FakePostRepository;
@@ -15,15 +19,20 @@ class GetPostUseCaseTest {
 
     private GetPostUseCase useCase;
     private PostRepository postRepository;
+    private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
         postRepository = new FakePostRepository();
-        useCase = new GetPostUseCase(postRepository);
+        memberRepository = new FakeMemberRepository();
+        useCase = new GetPostUseCase(postRepository, memberRepository);
     }
 
     @Test
     void 게시글_조회_성공_및_조회수_증가() {
+        Member member = MemberFixture.create();
+        memberRepository.save(member);
+
         Post post = PostFixture.create(1L);
         postRepository.save(post);
 

@@ -7,6 +7,6 @@ public record CreatePostResponse(
         Long boardId,
         String title,
         String content,
-        String author,
+        Long memberId,
         LocalDateTime createdAt
 ) {}

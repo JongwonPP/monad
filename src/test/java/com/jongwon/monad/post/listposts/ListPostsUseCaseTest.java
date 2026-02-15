@@ -1,6 +1,8 @@
 package com.jongwon.monad.post.listposts;
 
 import com.jongwon.monad.fixture.PostFixture;
+import com.jongwon.monad.member.domain.MemberRepository;
+import com.jongwon.monad.member.fake.FakeMemberRepository;
 import com.jongwon.monad.post.domain.PostRepository;
 import com.jongwon.monad.post.fake.FakePostRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +14,13 @@ class ListPostsUseCaseTest {
 
     private ListPostsUseCase useCase;
     private PostRepository postRepository;
+    private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
         postRepository = new FakePostRepository();
-        useCase = new ListPostsUseCase(postRepository);
+        memberRepository = new FakeMemberRepository();
+        useCase = new ListPostsUseCase(postRepository, memberRepository);
     }
 
     @Test

@@ -17,11 +17,11 @@ public class CreatePostUseCase {
         this.boardRepository = boardRepository;
     }
 
-    public CreatePostResponse execute(Long boardId, CreatePostRequest request) {
+    public CreatePostResponse execute(Long boardId, Long memberId, CreatePostRequest request) {
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException("게시판을 찾을 수 없습니다."));
 
-        Post post = Post.create(boardId, request.title(), request.content(), request.author());
+        Post post = Post.create(boardId, request.title(), request.content(), memberId);
         Post saved = postRepository.save(post);
 
         return new CreatePostResponse(
@@ -29,7 +29,7 @@ public class CreatePostUseCase {
                 saved.getBoardId(),
                 saved.getTitle(),
                 saved.getContent(),
-                saved.getAuthor(),
+                saved.getMemberId(),
                 saved.getCreatedAt()
         );
     }

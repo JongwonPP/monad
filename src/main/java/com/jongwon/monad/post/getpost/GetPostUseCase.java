@@ -1,6 +1,7 @@
 package com.jongwon.monad.post.getpost;
 
 import com.jongwon.monad.global.exception.EntityNotFoundException;
+import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
 import org.springframework.stereotype.Service;
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Service;
 public class GetPostUseCase {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
-    public GetPostUseCase(PostRepository postRepository) {
+    public GetPostUseCase(PostRepository postRepository, MemberRepository memberRepository) {
         this.postRepository = postRepository;
+        this.memberRepository = memberRepository;
     }
 
     public GetPostResponse execute(Long postId) {
@@ -21,12 +24,17 @@ public class GetPostUseCase {
         post.increaseViewCount();
         postRepository.save(post);
 
+        String nickname = memberRepository.findById(post.getMemberId())
+                .map(member -> member.getNickname())
+                .orElse("알 수 없음");
+
         return new GetPostResponse(
                 post.getId(),
                 post.getBoardId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getAuthor(),
+                post.getMemberId(),
+                nickname,
                 post.getViewCount(),
                 post.getCreatedAt()
         );

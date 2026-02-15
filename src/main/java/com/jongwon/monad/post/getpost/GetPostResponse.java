@@ -7,7 +7,8 @@ public record GetPostResponse(
         Long boardId,
         String title,
         String content,
-        String author,
+        Long memberId,
+        String nickname,
         int viewCount,
         LocalDateTime createdAt
 ) {}

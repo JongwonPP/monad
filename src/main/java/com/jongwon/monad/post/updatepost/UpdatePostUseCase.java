@@ -14,9 +14,13 @@ public class UpdatePostUseCase {
         this.postRepository = postRepository;
     }
 
-    public UpdatePostResponse execute(Long postId, UpdatePostRequest request) {
+    public UpdatePostResponse execute(Long postId, Long memberId, UpdatePostRequest request) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
+        if (!post.getMemberId().equals(memberId)) {
+            throw new IllegalArgumentException("본인의 글만 수정할 수 있습니다");
+        }
 
         post.update(request.title(), request.content());
         Post saved = postRepository.save(post);

@@ -8,31 +8,33 @@ public class Post {
     private Long boardId;
     private String title;
     private String content;
-    private String author;
+    private Long memberId;
     private int viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Post(Long boardId, String title, String content, String author,
+    private Post(Long boardId, String title, String content, Long memberId,
                  int viewCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.boardId = boardId;
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.memberId = memberId;
         this.viewCount = viewCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static Post create(Long boardId, String title, String content, String author) {
+    public static Post create(Long boardId, String title, String content, Long memberId) {
         if (boardId == null) {
             throw new IllegalArgumentException("게시판 ID는 필수입니다");
         }
         validateTitle(title);
         validateContent(content);
-        validateAuthor(author);
+        if (memberId == null) {
+            throw new IllegalArgumentException("회원 ID는 필수입니다");
+        }
         LocalDateTime now = LocalDateTime.now();
-        return new Post(boardId, title, content, author, 0, now, now);
+        return new Post(boardId, title, content, memberId, 0, now, now);
     }
 
     public void update(String title, String content) {
@@ -67,12 +69,6 @@ public class Post {
         }
     }
 
-    private static void validateAuthor(String author) {
-        if (author == null || author.isBlank()) {
-            throw new IllegalArgumentException("작성자는 빈 값일 수 없습니다");
-        }
-    }
-
     public Long getId() {
         return id;
     }
@@ -89,8 +85,8 @@ public class Post {
         return content;
     }
 
-    public String getAuthor() {
-        return author;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public int getViewCount() {

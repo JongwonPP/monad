@@ -1,5 +1,6 @@
 package com.jongwon.monad.post.updatepost;
 
+import com.jongwon.monad.global.security.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +21,9 @@ public class UpdatePostController {
     public ResponseEntity<UpdatePostResponse> updatePost(
             @PathVariable Long boardId,
             @PathVariable Long postId,
-            @Valid @RequestBody UpdatePostRequest request) {
-        UpdatePostResponse response = updatePostUseCase.execute(postId, request);
+            @Valid @RequestBody UpdatePostRequest request,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal) {
+        UpdatePostResponse response = updatePostUseCase.execute(postId, principal.memberId(), request);
         return ResponseEntity.ok(response);
     }
 }
