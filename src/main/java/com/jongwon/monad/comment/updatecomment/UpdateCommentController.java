@@ -1,5 +1,6 @@
 package com.jongwon.monad.comment.updatecomment;
 
+import com.jongwon.monad.global.security.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +21,9 @@ public class UpdateCommentController {
     public ResponseEntity<UpdateCommentResponse> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal,
             @Valid @RequestBody UpdateCommentRequest request) {
-        UpdateCommentResponse response = updateCommentUseCase.execute(commentId, request);
+        UpdateCommentResponse response = updateCommentUseCase.execute(commentId, principal.memberId(), request);
         return ResponseEntity.ok(response);
     }
 }

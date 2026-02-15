@@ -15,32 +15,34 @@ public class Comment {
     private Long id;
     private Long postId;
     private Long parentId;
-    private String author;
+    private Long memberId;
     private String content;
     private List<String> mentions;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Comment(Long postId, Long parentId, String author, String content,
+    private Comment(Long postId, Long parentId, Long memberId, String content,
                     List<String> mentions, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.postId = postId;
         this.parentId = parentId;
-        this.author = author;
+        this.memberId = memberId;
         this.content = content;
         this.mentions = mentions;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static Comment create(Long postId, Long parentId, String author, String content) {
+    public static Comment create(Long postId, Long parentId, Long memberId, String content) {
         if (postId == null) {
             throw new IllegalArgumentException("게시글 ID는 필수입니다");
         }
-        validateAuthor(author);
+        if (memberId == null) {
+            throw new IllegalArgumentException("회원 ID는 필수입니다");
+        }
         validateContent(content);
         LocalDateTime now = LocalDateTime.now();
         List<String> mentions = parseMentions(content);
-        return new Comment(postId, parentId, author, content, mentions, now, now);
+        return new Comment(postId, parentId, memberId, content, mentions, now, now);
     }
 
     public void update(String content) {
@@ -92,12 +94,6 @@ public class Comment {
         }
     }
 
-    private static void validateAuthor(String author) {
-        if (author == null || author.isBlank()) {
-            throw new IllegalArgumentException("작성자는 빈 값일 수 없습니다");
-        }
-    }
-
     public Long getId() {
         return id;
     }
@@ -110,8 +106,8 @@ public class Comment {
         return parentId;
     }
 
-    public String getAuthor() {
-        return author;
+    public Long getMemberId() {
+        return memberId;
     }
 
     public String getContent() {

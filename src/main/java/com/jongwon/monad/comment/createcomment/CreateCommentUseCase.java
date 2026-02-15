@@ -24,11 +24,11 @@ public class CreateCommentUseCase {
         this.memberRepository = memberRepository;
     }
 
-    public CreateCommentResponse execute(Long postId, CreateCommentRequest request) {
+    public CreateCommentResponse execute(Long postId, Long memberId, CreateCommentRequest request) {
         postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
 
-        Comment comment = Comment.create(postId, null, request.author(), request.content());
+        Comment comment = Comment.create(postId, null, memberId, request.content());
 
         List<String> validMentions = comment.getMentions().stream()
                 .filter(memberRepository::existsByNickname)
@@ -40,7 +40,7 @@ public class CreateCommentUseCase {
         return new CreateCommentResponse(
                 saved.getId(),
                 saved.getPostId(),
-                saved.getAuthor(),
+                saved.getMemberId(),
                 saved.getContent(),
                 saved.getMentions(),
                 saved.getCreatedAt()

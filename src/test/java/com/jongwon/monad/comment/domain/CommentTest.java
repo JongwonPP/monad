@@ -11,11 +11,11 @@ class CommentTest {
 
     @Test
     void 일반_댓글_정상_생성() {
-        Comment comment = Comment.create(1L, null, "작성자", "댓글 내용");
+        Comment comment = Comment.create(1L, null, 1L, "댓글 내용");
 
         assertThat(comment.getPostId()).isEqualTo(1L);
         assertThat(comment.getParentId()).isNull();
-        assertThat(comment.getAuthor()).isEqualTo("작성자");
+        assertThat(comment.getMemberId()).isEqualTo(1L);
         assertThat(comment.getContent()).isEqualTo("댓글 내용");
         assertThat(comment.isReply()).isFalse();
         assertThat(comment.getCreatedAt()).isNotNull();
@@ -24,7 +24,7 @@ class CommentTest {
 
     @Test
     void 대댓글_정상_생성() {
-        Comment reply = Comment.create(1L, 10L, "답글자", "대댓글 내용");
+        Comment reply = Comment.create(1L, 10L, 1L, "대댓글 내용");
 
         assertThat(reply.getParentId()).isEqualTo(10L);
         assertThat(reply.isReply()).isTrue();
@@ -32,44 +32,38 @@ class CommentTest {
 
     @Test
     void content_null이면_예외() {
-        assertThatThrownBy(() -> Comment.create(1L, null, "작성자", null))
+        assertThatThrownBy(() -> Comment.create(1L, null, 1L, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void content_빈문자열이면_예외() {
-        assertThatThrownBy(() -> Comment.create(1L, null, "작성자", ""))
+        assertThatThrownBy(() -> Comment.create(1L, null, 1L, ""))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void content_500자_초과면_예외() {
         String longContent = "a".repeat(501);
-        assertThatThrownBy(() -> Comment.create(1L, null, "작성자", longContent))
+        assertThatThrownBy(() -> Comment.create(1L, null, 1L, longContent))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void author_null이면_예외() {
+    void memberId_null이면_예외() {
         assertThatThrownBy(() -> Comment.create(1L, null, null, "내용"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void author_빈문자열이면_예외() {
-        assertThatThrownBy(() -> Comment.create(1L, null, "", "내용"))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void postId_null이면_예외() {
-        assertThatThrownBy(() -> Comment.create(null, null, "작성자", "내용"))
+        assertThatThrownBy(() -> Comment.create(null, null, 1L, "내용"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 댓글_수정_성공() {
-        Comment comment = Comment.create(1L, null, "작성자", "원래 내용");
+        Comment comment = Comment.create(1L, null, 1L, "원래 내용");
         LocalDateTimeSnapshot before = new LocalDateTimeSnapshot(comment.getUpdatedAt());
 
         comment.update("수정된 내용");
@@ -80,8 +74,8 @@ class CommentTest {
 
     @Test
     void isReply_parentId_null이면_false_있으면_true() {
-        Comment comment = Comment.create(1L, null, "작성자", "내용");
-        Comment reply = Comment.create(1L, 5L, "작성자", "내용");
+        Comment comment = Comment.create(1L, null, 1L, "내용");
+        Comment reply = Comment.create(1L, 5L, 1L, "내용");
 
         assertThat(comment.isReply()).isFalse();
         assertThat(reply.isReply()).isTrue();
@@ -89,35 +83,35 @@ class CommentTest {
 
     @Test
     void 멘션_파싱_닉네임_추출() {
-        Comment comment = Comment.create(1L, null, "작성자", "@홍길동 안녕");
+        Comment comment = Comment.create(1L, null, 1L, "@홍길동 안녕");
 
         assertThat(comment.getMentions()).containsExactly("홍길동");
     }
 
     @Test
     void 멘션_파싱_멘션_없으면_빈리스트() {
-        Comment comment = Comment.create(1L, null, "작성자", "멘션 없는 댓글");
+        Comment comment = Comment.create(1L, null, 1L, "멘션 없는 댓글");
 
         assertThat(comment.getMentions()).isEmpty();
     }
 
     @Test
     void 멘션_파싱_중복_제거() {
-        Comment comment = Comment.create(1L, null, "작성자", "@홍길동 @홍길동 중복");
+        Comment comment = Comment.create(1L, null, 1L, "@홍길동 @홍길동 중복");
 
         assertThat(comment.getMentions()).containsExactly("홍길동");
     }
 
     @Test
     void 멘션_파싱_2자_미만_무시() {
-        Comment comment = Comment.create(1L, null, "작성자", "@a 한글자");
+        Comment comment = Comment.create(1L, null, 1L, "@a 한글자");
 
         assertThat(comment.getMentions()).isEmpty();
     }
 
     @Test
     void 수정_시_멘션_재파싱() {
-        Comment comment = Comment.create(1L, null, "작성자", "@홍길동 안녕");
+        Comment comment = Comment.create(1L, null, 1L, "@홍길동 안녕");
         assertThat(comment.getMentions()).containsExactly("홍길동");
 
         comment.update("@김철수 반가워");
@@ -127,7 +121,7 @@ class CommentTest {
 
     @Test
     void filterMentions_유효한_닉네임만_남김() {
-        Comment comment = Comment.create(1L, null, "작성자", "@홍길동 @김철수 @이영희 안녕");
+        Comment comment = Comment.create(1L, null, 1L, "@홍길동 @김철수 @이영희 안녕");
         assertThat(comment.getMentions()).containsExactly("홍길동", "김철수", "이영희");
 
         comment.filterMentions(List.of("홍길동", "이영희"));

@@ -38,13 +38,13 @@ class CreateReplyUseCaseTest {
         var parent = CommentFixture.create(post.getId());
         commentRepository.save(parent);
 
-        CreateReplyRequest request = new CreateReplyRequest("답글작성자", "답글 내용입니다");
-        CreateReplyResponse response = useCase.execute(post.getId(), parent.getId(), request);
+        CreateReplyRequest request = new CreateReplyRequest("답글 내용입니다");
+        CreateReplyResponse response = useCase.execute(post.getId(), parent.getId(), 2L, request);
 
         assertThat(response.id()).isNotNull();
         assertThat(response.postId()).isEqualTo(post.getId());
         assertThat(response.parentId()).isEqualTo(parent.getId());
-        assertThat(response.author()).isEqualTo("답글작성자");
+        assertThat(response.memberId()).isEqualTo(2L);
         assertThat(response.content()).isEqualTo("답글 내용입니다");
         assertThat(response.createdAt()).isNotNull();
     }
@@ -54,9 +54,9 @@ class CreateReplyUseCaseTest {
         var post = PostFixture.create(1L);
         postRepository.save(post);
 
-        CreateReplyRequest request = new CreateReplyRequest("답글작성자", "답글 내용");
+        CreateReplyRequest request = new CreateReplyRequest("답글 내용");
 
-        assertThatThrownBy(() -> useCase.execute(post.getId(), 999L, request))
+        assertThatThrownBy(() -> useCase.execute(post.getId(), 999L, 2L, request))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("댓글을 찾을 수 없습니다");
     }
@@ -72,9 +72,9 @@ class CreateReplyUseCaseTest {
         var reply = CommentFixture.createReply(post.getId(), parent.getId());
         commentRepository.save(reply);
 
-        CreateReplyRequest request = new CreateReplyRequest("답글작성자", "대대댓글 시도");
+        CreateReplyRequest request = new CreateReplyRequest("대대댓글 시도");
 
-        assertThatThrownBy(() -> useCase.execute(post.getId(), reply.getId(), request))
+        assertThatThrownBy(() -> useCase.execute(post.getId(), reply.getId(), 2L, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("대댓글에는 답글을 달 수 없습니다");
     }

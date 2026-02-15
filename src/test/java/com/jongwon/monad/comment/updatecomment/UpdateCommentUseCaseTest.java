@@ -35,7 +35,7 @@ class UpdateCommentUseCaseTest {
         memberRepository.save(member);
 
         UpdateCommentRequest request = new UpdateCommentRequest("수정된 내용 @홍길동 확인");
-        UpdateCommentResponse response = useCase.execute(comment.getId(), request);
+        UpdateCommentResponse response = useCase.execute(comment.getId(), 1L, request);
 
         assertThat(response.id()).isEqualTo(comment.getId());
         assertThat(response.content()).isEqualTo("수정된 내용 @홍길동 확인");
@@ -47,8 +47,20 @@ class UpdateCommentUseCaseTest {
     void 존재하지_않는_댓글_수정시_예외() {
         UpdateCommentRequest request = new UpdateCommentRequest("수정된 내용");
 
-        assertThatThrownBy(() -> useCase.execute(999L, request))
+        assertThatThrownBy(() -> useCase.execute(999L, 1L, request))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("댓글을 찾을 수 없습니다");
+    }
+
+    @Test
+    void 본인이_아닌_댓글_수정시_예외() {
+        var comment = CommentFixture.create(1L);
+        commentRepository.save(comment);
+
+        UpdateCommentRequest request = new UpdateCommentRequest("수정된 내용");
+
+        assertThatThrownBy(() -> useCase.execute(comment.getId(), 2L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("본인의 댓글만 수정할 수 있습니다");
     }
 }

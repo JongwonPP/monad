@@ -24,7 +24,7 @@ public class CreateReplyUseCase {
         this.memberRepository = memberRepository;
     }
 
-    public CreateReplyResponse execute(Long postId, Long commentId, CreateReplyRequest request) {
+    public CreateReplyResponse execute(Long postId, Long commentId, Long memberId, CreateReplyRequest request) {
         postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
 
@@ -35,7 +35,7 @@ public class CreateReplyUseCase {
             throw new IllegalArgumentException("대댓글에는 답글을 달 수 없습니다");
         }
 
-        Comment reply = Comment.create(postId, commentId, request.author(), request.content());
+        Comment reply = Comment.create(postId, commentId, memberId, request.content());
 
         List<String> validMentions = reply.getMentions().stream()
                 .filter(memberRepository::existsByNickname)
@@ -48,7 +48,7 @@ public class CreateReplyUseCase {
                 saved.getId(),
                 saved.getPostId(),
                 saved.getParentId(),
-                saved.getAuthor(),
+                saved.getMemberId(),
                 saved.getContent(),
                 saved.getMentions(),
                 saved.getCreatedAt()

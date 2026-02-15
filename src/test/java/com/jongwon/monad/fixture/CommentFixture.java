@@ -5,14 +5,14 @@ import com.jongwon.monad.comment.domain.Comment;
 public class CommentFixture {
 
     public static Comment create(Long postId) {
-        return Comment.create(postId, null, "댓글작성자", "테스트 댓글입니다");
+        return Comment.create(postId, null, 1L, "테스트 댓글입니다");
     }
 
     public static Comment createReply(Long postId, Long parentId) {
-        return Comment.create(postId, parentId, "답글작성자", "테스트 답글입니다");
+        return Comment.create(postId, parentId, 2L, "테스트 답글입니다");
     }
 
     public static Comment createWithMention(Long postId, String nickname) {
-        return Comment.create(postId, null, "댓글작성자", "@" + nickname + " 안녕하세요");
+        return Comment.create(postId, null, 1L, "@" + nickname + " 안녕하세요");
     }
 }

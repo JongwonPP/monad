@@ -6,7 +6,7 @@ import java.util.List;
 public record CreateCommentResponse(
         Long id,
         Long postId,
-        String author,
+        Long memberId,
         String content,
         List<String> mentions,
         LocalDateTime createdAt

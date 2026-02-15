@@ -35,21 +35,21 @@ class CreateCommentUseCaseTest {
         var post = PostFixture.create(1L);
         postRepository.save(post);
 
-        CreateCommentRequest request = new CreateCommentRequest("작성자", "댓글 내용입니다");
-        CreateCommentResponse response = useCase.execute(post.getId(), request);
+        CreateCommentRequest request = new CreateCommentRequest("댓글 내용입니다");
+        CreateCommentResponse response = useCase.execute(post.getId(), 1L, request);
 
         assertThat(response.id()).isNotNull();
         assertThat(response.postId()).isEqualTo(post.getId());
-        assertThat(response.author()).isEqualTo("작성자");
+        assertThat(response.memberId()).isEqualTo(1L);
         assertThat(response.content()).isEqualTo("댓글 내용입니다");
         assertThat(response.createdAt()).isNotNull();
     }
 
     @Test
     void 존재하지_않는_게시글에_댓글_작성시_예외() {
-        CreateCommentRequest request = new CreateCommentRequest("작성자", "댓글 내용");
+        CreateCommentRequest request = new CreateCommentRequest("댓글 내용");
 
-        assertThatThrownBy(() -> useCase.execute(999L, request))
+        assertThatThrownBy(() -> useCase.execute(999L, 1L, request))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("게시글을 찾을 수 없습니다");
     }
@@ -62,8 +62,8 @@ class CreateCommentUseCaseTest {
         var member = MemberFixture.createWithNickname("홍길동");
         memberRepository.save(member);
 
-        CreateCommentRequest request = new CreateCommentRequest("작성자", "@홍길동 안녕하세요");
-        CreateCommentResponse response = useCase.execute(post.getId(), request);
+        CreateCommentRequest request = new CreateCommentRequest("@홍길동 안녕하세요");
+        CreateCommentResponse response = useCase.execute(post.getId(), 1L, request);
 
         assertThat(response.mentions()).containsExactly("홍길동");
     }
@@ -73,8 +73,8 @@ class CreateCommentUseCaseTest {
         var post = PostFixture.create(1L);
         postRepository.save(post);
 
-        CreateCommentRequest request = new CreateCommentRequest("작성자", "@없는유저 안녕하세요");
-        CreateCommentResponse response = useCase.execute(post.getId(), request);
+        CreateCommentRequest request = new CreateCommentRequest("@없는유저 안녕하세요");
+        CreateCommentResponse response = useCase.execute(post.getId(), 1L, request);
 
         assertThat(response.mentions()).isEmpty();
     }

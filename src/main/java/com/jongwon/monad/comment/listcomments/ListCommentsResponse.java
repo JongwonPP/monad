@@ -9,7 +9,8 @@ public record ListCommentsResponse(
 ) {
     public record CommentItem(
             Long id,
-            String author,
+            Long memberId,
+            String nickname,
             String content,
             List<String> mentions,
             LocalDateTime createdAt,
@@ -18,7 +19,8 @@ public record ListCommentsResponse(
 
     public record ReplyItem(
             Long id,
-            String author,
+            Long memberId,
+            String nickname,
             String content,
             List<String> mentions,
             LocalDateTime createdAt

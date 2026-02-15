@@ -4,6 +4,9 @@ import com.jongwon.monad.comment.domain.Comment;
 import com.jongwon.monad.comment.domain.CommentRepository;
 import com.jongwon.monad.comment.fake.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
+import com.jongwon.monad.fixture.MemberFixture;
+import com.jongwon.monad.member.domain.MemberRepository;
+import com.jongwon.monad.member.fake.FakeMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +16,13 @@ class ListCommentsUseCaseTest {
 
     private ListCommentsUseCase useCase;
     private CommentRepository commentRepository;
+    private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
         commentRepository = new FakeCommentRepository();
-        useCase = new ListCommentsUseCase(commentRepository);
+        memberRepository = new FakeMemberRepository();
+        useCase = new ListCommentsUseCase(commentRepository, memberRepository);
     }
 
     @Test

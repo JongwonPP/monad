@@ -1,5 +1,6 @@
 package com.jongwon.monad.comment.createcomment;
 
+import com.jongwon.monad.global.security.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,9 @@ public class CreateCommentController {
     @PostMapping("/api/v1/posts/{postId}/comments")
     public ResponseEntity<CreateCommentResponse> createComment(
             @PathVariable Long postId,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal,
             @Valid @RequestBody CreateCommentRequest request) {
-        CreateCommentResponse response = createCommentUseCase.execute(postId, request);
+        CreateCommentResponse response = createCommentUseCase.execute(postId, principal.memberId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

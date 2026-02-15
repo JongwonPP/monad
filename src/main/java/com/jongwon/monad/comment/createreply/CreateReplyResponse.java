@@ -7,7 +7,7 @@ public record CreateReplyResponse(
         Long id,
         Long postId,
         Long parentId,
-        String author,
+        Long memberId,
         String content,
         List<String> mentions,
         LocalDateTime createdAt

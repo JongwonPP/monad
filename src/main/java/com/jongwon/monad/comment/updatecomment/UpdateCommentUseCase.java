@@ -20,9 +20,13 @@ public class UpdateCommentUseCase {
         this.memberRepository = memberRepository;
     }
 
-    public UpdateCommentResponse execute(Long commentId, UpdateCommentRequest request) {
+    public UpdateCommentResponse execute(Long commentId, Long memberId, UpdateCommentRequest request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글을 찾을 수 없습니다: " + commentId));
+
+        if (!comment.getMemberId().equals(memberId)) {
+            throw new IllegalArgumentException("본인의 댓글만 수정할 수 있습니다");
+        }
 
         comment.update(request.content());
 

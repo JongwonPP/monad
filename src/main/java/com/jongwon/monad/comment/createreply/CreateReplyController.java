@@ -1,5 +1,6 @@
 package com.jongwon.monad.comment.createreply;
 
+import com.jongwon.monad.global.security.AuthenticationPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,9 @@ public class CreateReplyController {
     public ResponseEntity<CreateReplyResponse> createReply(
             @PathVariable Long postId,
             @PathVariable Long commentId,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal,
             @Valid @RequestBody CreateReplyRequest request) {
-        CreateReplyResponse response = createReplyUseCase.execute(postId, commentId, request);
+        CreateReplyResponse response = createReplyUseCase.execute(postId, commentId, principal.memberId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
