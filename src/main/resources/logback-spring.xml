@@ -12,8 +12,8 @@
     <!-- 애플리케이션 로그 -->
     <logger name="com.jongwon.monad" level="DEBUG"/>
 
-    <!-- Spring Web 요청 로그 -->
-    <logger name="org.springframework.web" level="DEBUG"/>
+    <!-- Spring Web 요청 로깅 필터 -->
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG"/>
 
     <!-- Spring Security 로그 (필요시 DEBUG로 변경) -->
     <logger name="org.springframework.security" level="INFO"/>
