@@ -8,7 +8,7 @@ H2 + JdbcTemplate + Flyway 기반 DB 연동. Spring Profile로 local/prod 환경
 
 | Profile | Repository 구현체 | DB | 설명 |
 |---------|------------------|-----|------|
-| `local` (기본) | `InMemory*Repository` | 없음 | ConcurrentHashMap 기반, 앱 재시작 시 데이터 초기화 |
+| `local` (기본) | `Fake*Repository` | 없음 | ConcurrentHashMap 기반, 앱 재시작 시 데이터 초기화 |
 | `prod` | `Jdbc*Repository` | H2 In-Memory | JdbcTemplate + Flyway 마이그레이션 |
 
 ### 실행 방법
@@ -46,7 +46,7 @@ domain/
 └── MemberRepository.java          ← Port (인터페이스)
 
 infra/
-├── InMemoryMemberRepository.java  ← @Profile("local")
+├── FakeMemberRepository.java      ← @Profile("local")
 └── JdbcMemberRepository.java      ← @Profile("prod")
 ```
 
@@ -59,10 +59,10 @@ infra/
 
 | Port | local 어댑터 | prod 어댑터 |
 |------|-------------|------------|
-| `MemberRepository` | `InMemoryMemberRepository` | `JdbcMemberRepository` |
-| `BoardRepository` | `InMemoryBoardRepository` | `JdbcBoardRepository` |
-| `PostRepository` | `InMemoryPostRepository` | `JdbcPostRepository` |
-| `CommentRepository` | `InMemoryCommentRepository` | `JdbcCommentRepository` |
+| `MemberRepository` | `FakeMemberRepository` | `JdbcMemberRepository` |
+| `BoardRepository` | `FakeBoardRepository` | `JdbcBoardRepository` |
+| `PostRepository` | `FakePostRepository` | `JdbcPostRepository` |
+| `CommentRepository` | `FakeCommentRepository` | `JdbcCommentRepository` |
 
 ## 도메인 엔티티 — reconstruct()
 
