@@ -26,6 +26,14 @@ public class Member {
         return new Member(email, password, nickname, now, now);
     }
 
+    public static Member reconstruct(Long id, String email, String password,
+                                      String nickname, LocalDateTime createdAt,
+                                      LocalDateTime updatedAt) {
+        Member member = new Member(email, password, nickname, createdAt, updatedAt);
+        member.id = id;
+        return member;
+    }
+
     public void updateProfile(String nickname) {
         validateNickname(nickname);
         this.nickname = nickname;

@@ -21,13 +21,15 @@
 - Spring Security (JWT 인증, 필터 체인)
 - JJWT (io.jsonwebtoken:jjwt-api 0.12.6)
 - Lombok
-- DB — 미정 (현재 InMemory Adapter 사용, 추후 교체)
+- Spring JDBC (JdbcTemplate)
+- H2 Database (In-Memory)
+- Flyway (DB 마이그레이션)
 
 ## Architecture
 
 - **Vertical Slice Architecture** — UseCase 단위로 코드 조직 (기술 계층 분리 X)
 - **DDD** — 순수 Java 도메인 엔티티, 프레임워크 무의존
-- **Port/Adapter** — Repository 인터페이스(Port)로 DB 추상화, InMemory Adapter로 동작
+- **Port/Adapter** — Repository 인터페이스(Port)로 DB 추상화, Profile별 Adapter 전환 (local: InMemory, prod: JDBC)
 - **TDD** — 도메인 규칙 테스트 + UseCase 테스트 (Fake 객체 + TestFixture)
 
 ## Project Structure
@@ -41,7 +43,7 @@ src/main/java/com/jongwon/monad/
 │   └── refresh/          Refresh UseCase + Controller + DTOs
 ├── member/
 │   ├── domain/           Member.java, MemberRepository.java (Port)
-│   ├── infra/            InMemoryMemberRepository.java
+│   ├── infra/            InMemoryMemberRepository(@Profile local), JdbcMemberRepository(@Profile prod)
 │   ├── signup/           SignUp UseCase + Controller + DTOs
 │   ├── getmember/        GetMember UseCase + Controller + DTOs
 │   ├── updatemember/     UpdateMember UseCase + Controller + DTOs
@@ -49,7 +51,7 @@ src/main/java/com/jongwon/monad/
 │   └── deletemember/     DeleteMember UseCase + Controller
 ├── board/
 │   ├── domain/           Board.java, BoardRepository.java (Port)
-│   ├── infra/            InMemoryBoardRepository.java
+│   ├── infra/            InMemoryBoardRepository(@Profile local), JdbcBoardRepository(@Profile prod)
 │   ├── createboard/      CreateBoard UseCase + Controller + DTOs
 │   ├── getboard/         GetBoard UseCase + Controller + DTOs
 │   ├── listboards/       ListBoards UseCase + Controller + DTOs
@@ -57,7 +59,7 @@ src/main/java/com/jongwon/monad/
 │   └── deleteboard/      DeleteBoard UseCase + Controller
 ├── post/
 │   ├── domain/           Post.java (memberId 기반), PostRepository.java (Port)
-│   ├── infra/            InMemoryPostRepository.java
+│   ├── infra/            InMemoryPostRepository(@Profile local), JdbcPostRepository(@Profile prod)
 │   ├── createpost/       CreatePost UseCase + Controller + DTOs
 │   ├── getpost/          GetPost UseCase + Controller + DTOs (닉네임 조회)
 │   ├── listposts/        ListPosts UseCase + Controller + DTOs (닉네임 조회)
@@ -65,7 +67,7 @@ src/main/java/com/jongwon/monad/
 │   └── deletepost/       DeletePost UseCase + Controller (본인 확인)
 ├── comment/
 │   ├── domain/           Comment.java (memberId 기반, @멘션 파싱), CommentRepository.java (Port)
-│   ├── infra/            InMemoryCommentRepository.java
+│   ├── infra/            InMemoryCommentRepository(@Profile local), JdbcCommentRepository(@Profile prod)
 │   ├── createcomment/    CreateComment UseCase + Controller + DTOs
 │   ├── createreply/      CreateReply UseCase + Controller + DTOs (depth 1 제한)
 │   ├── listcomments/     ListComments UseCase + Controller + DTOs (계층 구조, 닉네임 조회)
@@ -155,17 +157,34 @@ DELETE /api/v1/members/{id}                             회원 탈퇴
 - Controller에서 `@AuthenticationPrincipal AuthenticationPrincipal principal`로 인증 정보 추출
 - Post/Comment: memberId(Long) 기반, 조회 시 MemberRepository로 닉네임 조회
 
+## Profiles
+
+| Profile | Repository | DB | 용도 |
+|---------|------------|-----|------|
+| `local` (기본) | InMemory (ConcurrentHashMap) | 없음 | 빠른 로컬 개발, DB 없이 실행 |
+| `prod` | JdbcTemplate | H2 In-Memory + Flyway | DB 연동 동작 확인 |
+
+- `application.yml` — 공통 설정 (서버 포트, JWT)
+- `application-local.yml` — DataSource/Flyway 자동설정 제외
+- `application-prod.yml` — H2 datasource, Flyway, H2 콘솔 설정
+
 ## Build & Run
 
 ```bash
 ./gradlew build
-./gradlew bootRun    # http://localhost:8080
+./gradlew bootRun                                          # local 프로필 (기본, InMemory)
+./gradlew bootRun --args='--spring.profiles.active=prod'   # prod 프로필 (H2 + Flyway)
 ./gradlew test
 ```
 
+### H2 Console (prod 프로필만)
+- URL: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:mem:monad`
+- Username: `sa` / Password: (빈 값)
+
 ## Code Conventions
 
-- **도메인 엔티티**: 순수 Java (프레임워크 어노테이션 없음), 정적 팩토리 메서드, 도메인 검증 내장
+- **도메인 엔티티**: 순수 Java (프레임워크 어노테이션 없음), 정적 팩토리 메서드 (`create()` 생성용, `reconstruct()` DB 복원용), 도메인 검증 내장
 - **패키지**: Vertical Slice 단위 (lowercase: `board.createboard`, `member.signup`)
 - **Port**: 도메인 패키지에 인터페이스 정의 (Repository, PasswordEncoder, TokenProvider), infra/security 패키지에 구현체
 - **DTO**: record 사용, jakarta.validation 어노테이션 (@NotBlank 등)
@@ -174,8 +193,13 @@ DELETE /api/v1/members/{id}                             회원 탈퇴
 - **테스트**: Fake 객체 + TestFixture 사용, DB 의존 없는 단위 테스트
 - **도메인 간 참조**: ID 참조만 사용 (객체 참조 없음, 예: Post.boardId, Post.memberId)
 
+## DB Migration
+
+- Flyway 사용, 마이그레이션 파일: `src/main/resources/db/migration/`
+- 현재 버전: `V1__init_schema.sql` (member, board, post, comment 테이블 + 인덱스)
+- FK 제약 조건 미포함 (cascade 로직 추가 후 별도 마이그레이션으로 FK 추가 예정)
+
 ## Important Notes
 
-- 현재 브랜치: `feature/standard-board-crud`
-- DB 미정 — InMemory Adapter로 동작 중, DB 선택 후 Adapter만 교체하면 됨
-- 상세 개발 계획: `docs/crud.md`, `docs/member.md`, `docs/comment.md`, `docs/auth.md`
+- 현재 브랜치: `feature/add-db`
+- 상세 개발 계획: `docs/crud.md`, `docs/member.md`, `docs/comment.md`, `docs/auth.md`, `docs/database.md`

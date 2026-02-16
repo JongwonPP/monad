@@ -5,10 +5,10 @@ import com.jongwon.monad.fixture.PostFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
-import com.jongwon.monad.member.fake.FakeMemberRepository;
+import com.jongwon.monad.member.infra.FakeMemberRepository;
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
-import com.jongwon.monad.post.fake.FakePostRepository;
+import com.jongwon.monad.post.infra.FakePostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

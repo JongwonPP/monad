@@ -1,7 +1,7 @@
 package com.jongwon.monad.comment.deletecomment;
 
 import com.jongwon.monad.comment.domain.CommentRepository;
-import com.jongwon.monad.comment.fake.FakeCommentRepository;
+import com.jongwon.monad.comment.infra.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

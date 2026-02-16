@@ -1,19 +1,27 @@
-package com.jongwon.monad.comment.fake;
+package com.jongwon.monad.comment.infra;
 
 import com.jongwon.monad.comment.domain.Comment;
 import com.jongwon.monad.comment.domain.CommentRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
+@Profile("local")
 public class FakeCommentRepository implements CommentRepository {
 
-    private final Map<Long, Comment> store = new HashMap<>();
-    private long sequence = 0L;
+    private final Map<Long, Comment> store = new ConcurrentHashMap<>();
+    private final AtomicLong sequence = new AtomicLong(0L);
 
     @Override
     public Comment save(Comment comment) {
         if (comment.getId() == null) {
-            comment.assignId(++sequence);
+            comment.assignId(sequence.incrementAndGet());
         }
         store.put(comment.getId(), comment);
         return comment;

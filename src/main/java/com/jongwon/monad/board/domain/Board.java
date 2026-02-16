@@ -23,6 +23,13 @@ public class Board {
         return new Board(name, description, now, now);
     }
 
+    public static Board reconstruct(Long id, String name, String description,
+                                     LocalDateTime createdAt, LocalDateTime updatedAt) {
+        Board board = new Board(name, description, createdAt, updatedAt);
+        board.id = id;
+        return board;
+    }
+
     public void update(String name, String description) {
         validateName(name);
         this.name = name;
