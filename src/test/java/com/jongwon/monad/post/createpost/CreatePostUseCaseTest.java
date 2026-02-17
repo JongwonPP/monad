@@ -1,11 +1,11 @@
 package com.jongwon.monad.post.createpost;
 
 import com.jongwon.monad.board.domain.BoardRepository;
-import com.jongwon.monad.board.fake.FakeBoardRepository;
+import com.jongwon.monad.board.infra.FakeBoardRepository;
 import com.jongwon.monad.fixture.BoardFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.PostRepository;
-import com.jongwon.monad.post.fake.FakePostRepository;
+import com.jongwon.monad.post.infra.FakePostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

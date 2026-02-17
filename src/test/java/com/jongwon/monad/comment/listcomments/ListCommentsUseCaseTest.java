@@ -2,11 +2,11 @@ package com.jongwon.monad.comment.listcomments;
 
 import com.jongwon.monad.comment.domain.Comment;
 import com.jongwon.monad.comment.domain.CommentRepository;
-import com.jongwon.monad.comment.fake.FakeCommentRepository;
+import com.jongwon.monad.comment.infra.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
 import com.jongwon.monad.fixture.MemberFixture;
 import com.jongwon.monad.member.domain.MemberRepository;
-import com.jongwon.monad.member.fake.FakeMemberRepository;
+import com.jongwon.monad.member.infra.FakeMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

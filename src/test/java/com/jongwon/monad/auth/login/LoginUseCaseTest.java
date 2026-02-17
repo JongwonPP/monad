@@ -6,7 +6,7 @@ import com.jongwon.monad.auth.fake.FakePasswordEncoder;
 import com.jongwon.monad.auth.fake.FakeTokenProvider;
 import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
-import com.jongwon.monad.member.fake.FakeMemberRepository;
+import com.jongwon.monad.member.infra.FakeMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

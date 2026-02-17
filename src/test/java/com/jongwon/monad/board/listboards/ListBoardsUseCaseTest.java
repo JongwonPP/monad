@@ -1,7 +1,7 @@
 package com.jongwon.monad.board.listboards;
 
 import com.jongwon.monad.board.domain.BoardRepository;
-import com.jongwon.monad.board.fake.FakeBoardRepository;
+import com.jongwon.monad.board.infra.FakeBoardRepository;
 import com.jongwon.monad.fixture.BoardFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

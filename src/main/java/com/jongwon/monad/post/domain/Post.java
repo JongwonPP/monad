@@ -37,6 +37,14 @@ public class Post {
         return new Post(boardId, title, content, memberId, 0, now, now);
     }
 
+    public static Post reconstruct(Long id, Long boardId, String title, String content,
+                                    Long memberId, int viewCount,
+                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
+        Post post = new Post(boardId, title, content, memberId, viewCount, createdAt, updatedAt);
+        post.id = id;
+        return post;
+    }
+
     public void update(String title, String content) {
         validateTitle(title);
         validateContent(content);

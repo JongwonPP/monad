@@ -2,7 +2,7 @@ package com.jongwon.monad.board.getboard;
 
 import com.jongwon.monad.board.domain.Board;
 import com.jongwon.monad.board.domain.BoardRepository;
-import com.jongwon.monad.board.fake.FakeBoardRepository;
+import com.jongwon.monad.board.infra.FakeBoardRepository;
 import com.jongwon.monad.fixture.BoardFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

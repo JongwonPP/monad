@@ -32,6 +32,15 @@ public class Comment {
         this.updatedAt = updatedAt;
     }
 
+    public static Comment reconstruct(Long id, Long postId, Long parentId, Long memberId,
+                                        String content, LocalDateTime createdAt,
+                                        LocalDateTime updatedAt) {
+        List<String> mentions = parseMentions(content);
+        Comment comment = new Comment(postId, parentId, memberId, content, mentions, createdAt, updatedAt);
+        comment.id = id;
+        return comment;
+    }
+
     public static Comment create(Long postId, Long parentId, Long memberId, String content) {
         if (postId == null) {
             throw new IllegalArgumentException("게시글 ID는 필수입니다");

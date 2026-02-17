@@ -1,14 +1,14 @@
 package com.jongwon.monad.comment.createreply;
 
 import com.jongwon.monad.comment.domain.CommentRepository;
-import com.jongwon.monad.comment.fake.FakeCommentRepository;
+import com.jongwon.monad.comment.infra.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
 import com.jongwon.monad.fixture.PostFixture;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.member.domain.MemberRepository;
-import com.jongwon.monad.member.fake.FakeMemberRepository;
+import com.jongwon.monad.member.infra.FakeMemberRepository;
 import com.jongwon.monad.post.domain.PostRepository;
-import com.jongwon.monad.post.fake.FakePostRepository;
+import com.jongwon.monad.post.infra.FakePostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

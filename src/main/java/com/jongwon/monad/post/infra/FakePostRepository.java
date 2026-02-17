@@ -1,19 +1,27 @@
-package com.jongwon.monad.post.fake;
+package com.jongwon.monad.post.infra;
 
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
+@Profile("local")
 public class FakePostRepository implements PostRepository {
 
-    private final Map<Long, Post> store = new HashMap<>();
-    private long sequence = 0L;
+    private final Map<Long, Post> store = new ConcurrentHashMap<>();
+    private final AtomicLong sequence = new AtomicLong(0L);
 
     @Override
     public Post save(Post post) {
         if (post.getId() == null) {
-            post.assignId(++sequence);
+            post.assignId(sequence.incrementAndGet());
         }
         store.put(post.getId(), post);
         return post;
