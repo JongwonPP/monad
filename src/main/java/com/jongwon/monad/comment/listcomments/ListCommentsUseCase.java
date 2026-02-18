@@ -1,6 +1,7 @@
 package com.jongwon.monad.comment.listcomments;
 
 import com.jongwon.monad.comment.domain.Comment;
+import com.jongwon.monad.comment.domain.CommentLikeRepository;
 import com.jongwon.monad.comment.domain.CommentRepository;
 import com.jongwon.monad.member.domain.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,14 @@ public class ListCommentsUseCase {
 
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public ListCommentsUseCase(CommentRepository commentRepository,
-                               MemberRepository memberRepository) {
+                               MemberRepository memberRepository,
+                               CommentLikeRepository commentLikeRepository) {
         this.commentRepository = commentRepository;
         this.memberRepository = memberRepository;
+        this.commentLikeRepository = commentLikeRepository;
     }
 
     public ListCommentsResponse execute(Long postId) {
@@ -46,6 +50,7 @@ public class ListCommentsUseCase {
                                     lookupNickname(reply.getMemberId()),
                                     reply.getContent(),
                                     reply.getMentions(),
+                                    commentLikeRepository.countByCommentId(reply.getId()),
                                     reply.getCreatedAt()
                             ))
                             .toList();
@@ -56,6 +61,7 @@ public class ListCommentsUseCase {
                             parentNickname,
                             parent.getContent(),
                             parent.getMentions(),
+                            commentLikeRepository.countByCommentId(parent.getId()),
                             parent.getCreatedAt(),
                             replies
                     );

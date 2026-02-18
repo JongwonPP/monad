@@ -98,4 +98,19 @@ public class JdbcCommentRepository implements CommentRepository {
     public void deleteAllByParentId(Long parentId) {
         jdbcTemplate.update("DELETE FROM comment WHERE parent_id = ?", parentId);
     }
+
+    @Override
+    public List<Comment> findAllByMemberId(Long memberId, int page, int size) {
+        int offset = page * size;
+        return jdbcTemplate.query(
+                "SELECT * FROM comment WHERE member_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                rowMapper, memberId, size, offset);
+    }
+
+    @Override
+    public long countByMemberId(Long memberId) {
+        Long count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM comment WHERE member_id = ?", Long.class, memberId);
+        return count != null ? count : 0;
+    }
 }

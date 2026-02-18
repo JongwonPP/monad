@@ -7,7 +7,9 @@ import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.member.infra.FakeMemberRepository;
 import com.jongwon.monad.post.domain.Post;
+import com.jongwon.monad.post.domain.PostLikeRepository;
 import com.jongwon.monad.post.domain.PostRepository;
+import com.jongwon.monad.post.infra.FakePostLikeRepository;
 import com.jongwon.monad.post.infra.FakePostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,14 @@ class GetPostUseCaseTest {
     private GetPostUseCase useCase;
     private PostRepository postRepository;
     private MemberRepository memberRepository;
+    private PostLikeRepository postLikeRepository;
 
     @BeforeEach
     void setUp() {
         postRepository = new FakePostRepository();
         memberRepository = new FakeMemberRepository();
-        useCase = new GetPostUseCase(postRepository, memberRepository);
+        postLikeRepository = new FakePostLikeRepository();
+        useCase = new GetPostUseCase(postRepository, memberRepository, postLikeRepository);
     }
 
     @Test
@@ -36,7 +40,7 @@ class GetPostUseCaseTest {
         Post post = PostFixture.create(1L);
         postRepository.save(post);
 
-        GetPostResponse response = useCase.execute(post.getId());
+        GetPostResponse response = useCase.execute(post.getId(), null);
 
         assertThat(response.id()).isEqualTo(post.getId());
         assertThat(response.title()).isEqualTo("테스트 제목");
@@ -45,7 +49,7 @@ class GetPostUseCaseTest {
 
     @Test
     void 존재하지_않는_게시글_조회시_예외() {
-        assertThatThrownBy(() -> useCase.execute(999L))
+        assertThatThrownBy(() -> useCase.execute(999L, null))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 }

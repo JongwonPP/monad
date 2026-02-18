@@ -2,6 +2,7 @@ package com.jongwon.monad.post.infra;
 
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
+import com.jongwon.monad.post.domain.PostSortType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -72,12 +73,16 @@ public class JdbcPostRepository implements PostRepository {
     }
 
     @Override
-    public List<Post> findAllByBoardId(Long boardId, int page, int size) {
+    public List<Post> findAllByBoardId(Long boardId, int page, int size, PostSortType sortType) {
         int offset = page * size;
-        return jdbcTemplate.query(
-                "SELECT * FROM post WHERE board_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
-                rowMapper, boardId, size, offset
-        );
+        String orderBy = switch (sortType) {
+            case LATEST -> "created_at DESC";
+            case OLDEST -> "created_at ASC";
+            case VIEWS -> "view_count DESC, created_at DESC";
+            case LIKES -> "(SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.id) DESC, p.created_at DESC";
+        };
+        String sql = "SELECT p.* FROM post p WHERE p.board_id = ? ORDER BY " + orderBy + " LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, rowMapper, boardId, size, offset);
     }
 
     @Override
@@ -90,5 +95,55 @@ public class JdbcPostRepository implements PostRepository {
     @Override
     public void deleteById(Long id) {
         jdbcTemplate.update("DELETE FROM post WHERE id = ?", id);
+    }
+
+    @Override
+    public List<Post> searchByKeyword(String keyword, int page, int size) {
+        int offset = page * size;
+        String pattern = "%" + keyword + "%";
+        return jdbcTemplate.query(
+                "SELECT * FROM post WHERE title LIKE ? OR content LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                rowMapper, pattern, pattern, size, offset);
+    }
+
+    @Override
+    public long countByKeyword(String keyword) {
+        String pattern = "%" + keyword + "%";
+        Long count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM post WHERE title LIKE ? OR content LIKE ?", Long.class, pattern, pattern);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public List<Post> searchByBoardIdAndKeyword(Long boardId, String keyword, int page, int size) {
+        int offset = page * size;
+        String pattern = "%" + keyword + "%";
+        return jdbcTemplate.query(
+                "SELECT * FROM post WHERE board_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                rowMapper, boardId, pattern, pattern, size, offset);
+    }
+
+    @Override
+    public long countByBoardIdAndKeyword(Long boardId, String keyword) {
+        String pattern = "%" + keyword + "%";
+        Long count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM post WHERE board_id = ? AND (title LIKE ? OR content LIKE ?)",
+                Long.class, boardId, pattern, pattern);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public List<Post> findAllByMemberId(Long memberId, int page, int size) {
+        int offset = page * size;
+        return jdbcTemplate.query(
+                "SELECT * FROM post WHERE member_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                rowMapper, memberId, size, offset);
+    }
+
+    @Override
+    public long countByMemberId(Long memberId) {
+        Long count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM post WHERE member_id = ?", Long.class, memberId);
+        return count != null ? count : 0;
     }
 }

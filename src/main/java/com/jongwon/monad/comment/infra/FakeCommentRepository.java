@@ -5,6 +5,7 @@ import com.jongwon.monad.comment.domain.CommentRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,5 +56,22 @@ public class FakeCommentRepository implements CommentRepository {
     public void deleteAllByParentId(Long parentId) {
         store.entrySet().removeIf(entry ->
                 parentId.equals(entry.getValue().getParentId()));
+    }
+
+    @Override
+    public List<Comment> findAllByMemberId(Long memberId, int page, int size) {
+        return store.values().stream()
+                .filter(comment -> comment.getMemberId().equals(memberId))
+                .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
+                .skip((long) page * size)
+                .limit(size)
+                .toList();
+    }
+
+    @Override
+    public long countByMemberId(Long memberId) {
+        return store.values().stream()
+                .filter(comment -> comment.getMemberId().equals(memberId))
+                .count();
     }
 }

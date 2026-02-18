@@ -1,7 +1,9 @@
 package com.jongwon.monad.comment.listcomments;
 
 import com.jongwon.monad.comment.domain.Comment;
+import com.jongwon.monad.comment.domain.CommentLikeRepository;
 import com.jongwon.monad.comment.domain.CommentRepository;
+import com.jongwon.monad.comment.infra.FakeCommentLikeRepository;
 import com.jongwon.monad.comment.infra.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
 import com.jongwon.monad.fixture.MemberFixture;
@@ -17,12 +19,14 @@ class ListCommentsUseCaseTest {
     private ListCommentsUseCase useCase;
     private CommentRepository commentRepository;
     private MemberRepository memberRepository;
+    private CommentLikeRepository commentLikeRepository;
 
     @BeforeEach
     void setUp() {
         commentRepository = new FakeCommentRepository();
         memberRepository = new FakeMemberRepository();
-        useCase = new ListCommentsUseCase(commentRepository, memberRepository);
+        commentLikeRepository = new FakeCommentLikeRepository();
+        useCase = new ListCommentsUseCase(commentRepository, memberRepository, commentLikeRepository);
     }
 
     @Test

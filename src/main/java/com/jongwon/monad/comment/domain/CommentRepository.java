@@ -16,4 +16,9 @@ public interface CommentRepository {
     void deleteById(Long id);
 
     void deleteAllByParentId(Long parentId);
+
+    // 마이페이지
+    List<Comment> findAllByMemberId(Long memberId, int page, int size);
+
+    long countByMemberId(Long memberId);
 }
