@@ -18,6 +18,9 @@ out/
 hs_err_pid*
 replay_pid*
 
+# H2 Database
+data/
+
 # OS
 .DS_Store
 Thumbs.db
