@@ -10,5 +10,7 @@ public record GetPostResponse(
         Long memberId,
         String nickname,
         int viewCount,
+        long likeCount,
+        boolean liked,
         LocalDateTime createdAt
 ) {}

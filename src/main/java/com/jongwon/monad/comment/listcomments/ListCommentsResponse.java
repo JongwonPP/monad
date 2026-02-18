@@ -13,6 +13,7 @@ public record ListCommentsResponse(
             String nickname,
             String content,
             List<String> mentions,
+            long likeCount,
             LocalDateTime createdAt,
             List<ReplyItem> replies
     ) {}
@@ -23,6 +24,7 @@ public record ListCommentsResponse(
             String nickname,
             String content,
             List<String> mentions,
+            long likeCount,
             LocalDateTime createdAt
     ) {}
 }

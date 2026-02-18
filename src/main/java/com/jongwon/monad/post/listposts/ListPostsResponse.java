@@ -15,6 +15,7 @@ public record ListPostsResponse(
             Long memberId,
             String nickname,
             int viewCount,
+            long likeCount,
             LocalDateTime createdAt
     ) {}
 }

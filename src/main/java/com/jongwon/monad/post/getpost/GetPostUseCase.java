@@ -3,6 +3,7 @@ package com.jongwon.monad.post.getpost;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.post.domain.Post;
+import com.jongwon.monad.post.domain.PostLikeRepository;
 import com.jongwon.monad.post.domain.PostRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +12,16 @@ public class GetPostUseCase {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
 
-    public GetPostUseCase(PostRepository postRepository, MemberRepository memberRepository) {
+    public GetPostUseCase(PostRepository postRepository, MemberRepository memberRepository,
+                          PostLikeRepository postLikeRepository) {
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
+        this.postLikeRepository = postLikeRepository;
     }
 
-    public GetPostResponse execute(Long postId) {
+    public GetPostResponse execute(Long postId, Long currentMemberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
 
@@ -28,6 +32,10 @@ public class GetPostUseCase {
                 .map(member -> member.getNickname())
                 .orElse("알 수 없음");
 
+        long likeCount = postLikeRepository.countByPostId(postId);
+        boolean liked = currentMemberId != null
+                && postLikeRepository.findByPostIdAndMemberId(postId, currentMemberId).isPresent();
+
         return new GetPostResponse(
                 post.getId(),
                 post.getBoardId(),
@@ -36,6 +44,8 @@ public class GetPostUseCase {
                 post.getMemberId(),
                 nickname,
                 post.getViewCount(),
+                likeCount,
+                liked,
                 post.getCreatedAt()
         );
     }
