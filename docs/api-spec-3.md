@@ -1,6 +1,42 @@
-# Monad API 명세 — 이미지 첨부
+# Monad API 명세 — 이미지 첨부 & 예외 처리 개선
 
 > 기본 CRUD API는 [api-spec.md](api-spec.md), 검색/정렬/좋아요는 [api-spec-2.md](api-spec-2.md) 참고
+
+---
+
+## 에러 응답 체계 변경
+
+기존에 대부분 `400`으로 처리하던 에러를 의미에 맞는 HTTP 상태 코드로 분리하였다.
+
+### 에러 상태 코드 매핑
+
+| HTTP Status | 의미 | 발생 상황 |
+|-------------|------|----------|
+| 400 | 잘못된 요청 | 입력값 검증 실패, 도메인 규칙 위반 (파일 형식 불가, 크기 초과, 대대댓글 시도 등) |
+| 401 | 인증 실패 | 토큰 없음/만료, 로그인 실패 (이메일/비밀번호 불일치) |
+| 403 | 권한 없음 | 본인의 리소스가 아닌 경우 (글 수정/삭제, 이미지 첨부/삭제, 댓글 수정/삭제) |
+| 404 | 리소스 없음 | 게시글/게시판/회원/댓글/이미지 조회 실패 |
+| 409 | 중복 | 이메일/닉네임/게시판명 중복 |
+| 500 | 서버 오류 | 예상치 못한 서버 에러 |
+
+### 에러 응답 형식 (변경 없음)
+
+```json
+{ "message": "에러 메시지" }
+```
+
+### 기존 API 에러 코드 변경 내역
+
+| API | 에러 상황 | 이전 | 변경 |
+|-----|----------|------|------|
+| `PUT /api/v1/boards/{boardId}/posts/{postId}` | 본인의 글이 아님 | 400 | **403** |
+| `DELETE /api/v1/boards/{boardId}/posts/{postId}` | 본인의 글이 아님 | 400 | **403** |
+| `PUT /api/v1/posts/{postId}/comments/{commentId}` | 본인의 댓글이 아님 | 400 | **403** |
+| `DELETE /api/v1/posts/{postId}/comments/{commentId}` | 본인의 댓글이 아님 | 400 | **403** |
+| `POST /api/v1/members` | 이메일/닉네임 중복 | 400 | **409** |
+| `POST /api/v1/boards` | 게시판 이름 중복 | 400 | **409** |
+| `POST /api/v1/auth/login` | 이메일/비밀번호 불일치 | 400 | **401** |
+| 모든 인증 필요 API | 토큰 없이 접근 | HTML 응답 | **401 JSON** |
 
 ---
 
@@ -120,7 +156,8 @@ const response = await fetch('/api/v1/posts/1/images', {
 | createdAt | string | 업로드 일시 (ISO 8601) |
 
 **에러**:
-- `400` — 허용되지 않는 파일 형식, 파일 크기 초과(5MB), 이미지 5장 초과, 본인의 글이 아님
+- `400` — 허용되지 않는 파일 형식, 파일 크기 초과(5MB), 이미지 5장 초과
+- `403` — 본인의 글이 아님
 - `404` — 게시글 없음
 
 ---
@@ -177,7 +214,8 @@ DELETE /api/v1/posts/{postId}/images/{imageId}
 **Response** `204 No Content`
 
 **에러**:
-- `400` — 본인의 글이 아님, 해당 게시글의 이미지가 아님
+- `400` — 해당 게시글의 이미지가 아님
+- `403` — 본인의 글이 아님
 - `404` — 게시글 없음, 이미지 없음
 
 ---
@@ -198,3 +236,30 @@ DELETE /api/v1/posts/{postId}/images/{imageId}
 1. **게시글 작성 후 이미지 첨부**: 게시글을 먼저 생성(`POST /api/v1/boards/{boardId}/posts`)하고, 반환된 `postId`로 이미지를 업로드(`POST /api/v1/posts/{postId}/images`)
 2. **이미지 표시**: 게시글 조회 시 `images[].imageUrl`을 `<img src>` 속성에 사용
 3. **이미지 삭제**: `images[].id`와 `postId`로 삭제 요청
+
+### 프론트엔드 에러 핸들링 가이드
+
+```javascript
+const response = await fetch(url, options);
+
+if (!response.ok) {
+  const error = await response.json();
+  switch (response.status) {
+    case 400: // 입력값 오류 → 사용자에게 메시지 표시
+      showValidationError(error.message);
+      break;
+    case 401: // 인증 실패 → 로그인 페이지로 리다이렉트
+      redirectToLogin();
+      break;
+    case 403: // 권한 없음 → "권한이 없습니다" 표시
+      showForbiddenError(error.message);
+      break;
+    case 404: // 리소스 없음 → 목록으로 이동
+      showNotFoundError(error.message);
+      break;
+    case 409: // 중복 → 입력값 수정 유도
+      showDuplicateError(error.message);
+      break;
+  }
+}
+```
