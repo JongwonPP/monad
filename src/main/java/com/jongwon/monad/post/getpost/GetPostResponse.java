@@ -1,6 +1,7 @@
 package com.jongwon.monad.post.getpost;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record GetPostResponse(
         Long id,
@@ -12,5 +13,6 @@ public record GetPostResponse(
         int viewCount,
         long likeCount,
         boolean liked,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        List<ImageItem> images
 ) {}

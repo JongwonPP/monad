@@ -3,9 +3,12 @@ package com.jongwon.monad.post.getpost;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.post.domain.Post;
+import com.jongwon.monad.post.domain.PostImageRepository;
 import com.jongwon.monad.post.domain.PostLikeRepository;
 import com.jongwon.monad.post.domain.PostRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GetPostUseCase {
@@ -13,12 +16,14 @@ public class GetPostUseCase {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
+    private final PostImageRepository postImageRepository;
 
     public GetPostUseCase(PostRepository postRepository, MemberRepository memberRepository,
-                          PostLikeRepository postLikeRepository) {
+                          PostLikeRepository postLikeRepository, PostImageRepository postImageRepository) {
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
         this.postLikeRepository = postLikeRepository;
+        this.postImageRepository = postImageRepository;
     }
 
     public GetPostResponse execute(Long postId, Long currentMemberId) {
@@ -36,6 +41,10 @@ public class GetPostUseCase {
         boolean liked = currentMemberId != null
                 && postLikeRepository.findByPostIdAndMemberId(postId, currentMemberId).isPresent();
 
+        List<ImageItem> images = postImageRepository.findAllByPostId(postId).stream()
+                .map(img -> new ImageItem(img.getId(), "/api/v1/images/" + img.getStoredFilename(), img.getOriginalFilename()))
+                .toList();
+
         return new GetPostResponse(
                 post.getId(),
                 post.getBoardId(),
@@ -46,7 +55,8 @@ public class GetPostUseCase {
                 post.getViewCount(),
                 likeCount,
                 liked,
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                images
         );
     }
 }
