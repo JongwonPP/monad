@@ -1,6 +1,7 @@
 package com.jongwon.monad.post.uploadimage;
 
 import com.jongwon.monad.fixture.PostFixture;
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.ImageStorage;
 import com.jongwon.monad.post.domain.Post;
@@ -67,7 +68,7 @@ class UploadImageUseCaseTest {
         assertThatThrownBy(() -> useCase.execute(
                 post.getId(), 999L, "test.jpg", "image/jpeg", 1024L, new byte[]{1, 2, 3}
         ))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessageContaining("본인의 게시글만 이미지를 첨부할 수 있습니다");
     }
 

@@ -1,5 +1,6 @@
 package com.jongwon.monad.post.deletepost;
 
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.ImageStorage;
 import com.jongwon.monad.post.domain.Post;
@@ -29,7 +30,7 @@ public class DeletePostUseCase {
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
 
         if (!post.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("본인의 글만 삭제할 수 있습니다");
+            throw new AuthorizationException("본인의 글만 삭제할 수 있습니다");
         }
 
         List<PostImage> images = postImageRepository.findAllByPostId(postId);

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 public class UploadImageController {
 
@@ -24,15 +22,19 @@ public class UploadImageController {
     public ResponseEntity<UploadImageResponse> uploadImage(
             @PathVariable Long postId,
             @RequestParam("file") MultipartFile file,
-            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal) throws IOException {
-        UploadImageResponse response = uploadImageUseCase.execute(
-                postId,
-                principal.memberId(),
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getSize(),
-                file.getBytes()
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            @org.springframework.security.core.annotation.AuthenticationPrincipal AuthenticationPrincipal principal) {
+        try {
+            UploadImageResponse response = uploadImageUseCase.execute(
+                    postId,
+                    principal.memberId(),
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getSize(),
+                    file.getBytes()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (java.io.IOException e) {
+            throw new IllegalArgumentException("파일을 읽을 수 없습니다");
+        }
     }
 }

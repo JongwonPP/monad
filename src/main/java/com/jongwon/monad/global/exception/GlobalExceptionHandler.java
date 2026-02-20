@@ -25,6 +25,18 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", "인증이 필요합니다"));
     }
 
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<Map<String, String>> handleAuthorization(AuthorizationException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicate(DuplicateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", e.getMessage()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

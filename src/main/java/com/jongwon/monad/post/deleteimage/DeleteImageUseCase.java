@@ -1,5 +1,6 @@
 package com.jongwon.monad.post.deleteimage;
 
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.ImageStorage;
 import com.jongwon.monad.post.domain.Post;
@@ -27,7 +28,7 @@ public class DeleteImageUseCase {
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
         if (!post.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("본인의 게시글 이미지만 삭제할 수 있습니다");
+            throw new AuthorizationException("본인의 게시글 이미지만 삭제할 수 있습니다");
         }
 
         PostImage postImage = postImageRepository.findById(imageId)

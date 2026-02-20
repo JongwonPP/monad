@@ -2,6 +2,7 @@ package com.jongwon.monad.post.deletepost;
 
 import com.jongwon.monad.fixture.PostFixture;
 import com.jongwon.monad.fixture.PostImageFixture;
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.ImageStorage;
 import com.jongwon.monad.post.domain.Post;
@@ -54,7 +55,7 @@ class DeletePostUseCaseTest {
         postRepository.save(post);
 
         assertThatThrownBy(() -> useCase.execute(post.getId(), 2L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessageContaining("본인의 글만 삭제할 수 있습니다");
     }
 

@@ -15,11 +15,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthAccessDeniedHandler authAccessDeniedHandler;
+    private final AuthEntryPoint authEntryPoint;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          AuthAccessDeniedHandler authAccessDeniedHandler) {
+                          AuthAccessDeniedHandler authAccessDeniedHandler,
+                          AuthEntryPoint authEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.authAccessDeniedHandler = authAccessDeniedHandler;
+        this.authEntryPoint = authEntryPoint;
     }
 
     @Bean
@@ -31,6 +34,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(authAccessDeniedHandler)
+                        .authenticationEntryPoint(authEntryPoint)
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth

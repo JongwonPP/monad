@@ -1,6 +1,7 @@
 package com.jongwon.monad.post.updatepost;
 
 import com.jongwon.monad.fixture.PostFixture;
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import com.jongwon.monad.post.domain.Post;
 import com.jongwon.monad.post.domain.PostRepository;
@@ -52,7 +53,7 @@ class UpdatePostUseCaseTest {
         UpdatePostRequest request = new UpdatePostRequest("수정된 제목", "수정된 본문");
 
         assertThatThrownBy(() -> useCase.execute(post.getId(), 2L, request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessageContaining("본인의 글만 수정할 수 있습니다");
     }
 }
