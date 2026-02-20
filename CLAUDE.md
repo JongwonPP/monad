@@ -24,6 +24,7 @@ Java 25 / Spring Boot 4.0.2 / Gradle (Kotlin DSL) / Spring Security + JWT (JJWT 
 - **테스트**: Fake 객체(src/main/infra, @Profile 없이 직접 생성) + TestFixture(src/test/fixture)
 - **도메인 간 참조**: ID만 사용 (객체 참조 없음)
 - **인수 테스트는 무엇을(WHAT) 정의**하고, **단위 테스트는 어떻게(HOW)를 정의**한다.
+- **구현 순서**: /docs 디렉토리 하위에 **구현방법에 대한 계획 문서** 작성, 확인받고 다음 문서를 토대로 구현
 
 ## Build & Run
 
