@@ -1,6 +1,7 @@
 package com.jongwon.monad.member.signup;
 
 import com.jongwon.monad.auth.domain.PasswordEncoder;
+import com.jongwon.monad.global.exception.DuplicateException;
 import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,11 @@ public class SignUpUseCase {
 
     public SignUpResponse execute(SignUpRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
+            throw new DuplicateException("이미 사용 중인 이메일입니다");
         }
 
         if (memberRepository.existsByNickname(request.nickname())) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다");
+            throw new DuplicateException("이미 사용 중인 닉네임입니다");
         }
 
         Member.validateRawPassword(request.password());

@@ -15,11 +15,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthAccessDeniedHandler authAccessDeniedHandler;
+    private final AuthEntryPoint authEntryPoint;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          AuthAccessDeniedHandler authAccessDeniedHandler) {
+                          AuthAccessDeniedHandler authAccessDeniedHandler,
+                          AuthEntryPoint authEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.authAccessDeniedHandler = authAccessDeniedHandler;
+        this.authEntryPoint = authEntryPoint;
     }
 
     @Bean
@@ -31,16 +34,19 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(authAccessDeniedHandler)
+                        .authenticationEntryPoint(authEntryPoint)
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/members").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/boards/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts/*/comments").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

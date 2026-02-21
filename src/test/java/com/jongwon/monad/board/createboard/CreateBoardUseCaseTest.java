@@ -3,6 +3,7 @@ package com.jongwon.monad.board.createboard;
 import com.jongwon.monad.board.domain.BoardRepository;
 import com.jongwon.monad.board.infra.FakeBoardRepository;
 import com.jongwon.monad.fixture.BoardFixture;
+import com.jongwon.monad.global.exception.DuplicateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,7 @@ class CreateBoardUseCaseTest {
         CreateBoardRequest request = new CreateBoardRequest("자유게시판", "설명");
 
         assertThatThrownBy(() -> useCase.execute(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DuplicateException.class)
                 .hasMessageContaining("이미 존재하는 게시판 이름");
     }
 }

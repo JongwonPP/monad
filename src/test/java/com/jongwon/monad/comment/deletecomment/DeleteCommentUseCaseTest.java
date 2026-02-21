@@ -3,6 +3,7 @@ package com.jongwon.monad.comment.deletecomment;
 import com.jongwon.monad.comment.domain.CommentRepository;
 import com.jongwon.monad.comment.infra.FakeCommentRepository;
 import com.jongwon.monad.fixture.CommentFixture;
+import com.jongwon.monad.global.exception.AuthorizationException;
 import com.jongwon.monad.global.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class DeleteCommentUseCaseTest {
         commentRepository.save(comment);
 
         assertThatThrownBy(() -> useCase.execute(comment.getId(), 2L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(AuthorizationException.class)
                 .hasMessageContaining("본인의 댓글만 삭제할 수 있습니다");
     }
 }

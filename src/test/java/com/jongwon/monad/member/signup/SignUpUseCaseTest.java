@@ -3,6 +3,7 @@ package com.jongwon.monad.member.signup;
 import com.jongwon.monad.auth.domain.PasswordEncoder;
 import com.jongwon.monad.auth.fake.FakePasswordEncoder;
 import com.jongwon.monad.fixture.MemberFixture;
+import com.jongwon.monad.global.exception.DuplicateException;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.member.infra.FakeMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,7 @@ class SignUpUseCaseTest {
         SignUpRequest request = new SignUpRequest("test@example.com", "password123", "다른유저");
 
         assertThatThrownBy(() -> useCase.execute(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DuplicateException.class)
                 .hasMessageContaining("이미 사용 중인 이메일입니다");
     }
 
@@ -54,7 +55,7 @@ class SignUpUseCaseTest {
         SignUpRequest request = new SignUpRequest("new@example.com", "password123", "테스트유저");
 
         assertThatThrownBy(() -> useCase.execute(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(DuplicateException.class)
                 .hasMessageContaining("이미 사용 중인 닉네임입니다");
     }
 }

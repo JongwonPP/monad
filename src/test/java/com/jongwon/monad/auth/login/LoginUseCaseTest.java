@@ -7,6 +7,7 @@ import com.jongwon.monad.auth.fake.FakeTokenProvider;
 import com.jongwon.monad.member.domain.Member;
 import com.jongwon.monad.member.domain.MemberRepository;
 import com.jongwon.monad.member.infra.FakeMemberRepository;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ class LoginUseCaseTest {
         LoginRequest request = new LoginRequest("nonexistent@example.com", "password123");
 
         assertThatThrownBy(() -> useCase.execute(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadCredentialsException.class)
                 .hasMessageContaining("존재하지 않는 이메일입니다");
     }
 
@@ -58,7 +59,7 @@ class LoginUseCaseTest {
         LoginRequest request = new LoginRequest("test@example.com", "wrongPassword");
 
         assertThatThrownBy(() -> useCase.execute(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BadCredentialsException.class)
                 .hasMessageContaining("비밀번호가 일치하지 않습니다");
     }
 }
