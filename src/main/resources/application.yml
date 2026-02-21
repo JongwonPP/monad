@@ -19,3 +19,11 @@ jwt:
 image:
   storage:
     path: ./data/images
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
